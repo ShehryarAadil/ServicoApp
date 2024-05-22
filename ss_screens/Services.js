@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Animated, Easing, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { handleLogout } from '../Home/Start';
 
-// Import images for services
 import ElectricalImage from '../assets/logo.png';
 import CleaningImage from '../assets/logo.png';
 import PlumberImage from '../assets/logo.png';
@@ -11,8 +11,6 @@ import CarpenterImage from '../assets/logo.png';
 import MechanicImage from '../assets/logo.png';
 import PaintingImage from '../assets/logo.png';
 import GardenerImage from '../assets/logo.png';
-
-import { handleLogout } from '../Home/Start';
 
 const { width } = Dimensions.get('window');
 
@@ -27,7 +25,6 @@ const ServicesDashboard = () => {
   const scrollY = useRef(new Animated.Value(0)).current; // Added for scroll position
   const menuAnim = useRef(new Animated.Value(-300)).current; // For menu animation
 
-  // Define services data
   const servicesData = [
     { name: 'Electrical Services', image: ElectricalImage, route: 'ElectricalScreen' },
     { name: 'Cleaning Services', image: CleaningImage, route: 'CleaningScreen' },
@@ -39,7 +36,6 @@ const ServicesDashboard = () => {
     { name: 'Gardener Services', image: GardenerImage, route: 'GardenerScreen' },
   ];
 
-  // Images for slider
   const sliderImages = [
     require('../assets/Gardener1.jpg'),
     require('../assets/logo.png'),
@@ -47,7 +43,6 @@ const ServicesDashboard = () => {
   ];
 
   useEffect(() => {
-    // Fade in and out animation for the text
     Animated.loop(
       Animated.sequence([
         Animated.timing(fadeAnim, {
@@ -63,7 +58,6 @@ const ServicesDashboard = () => {
       ]),
     ).start();
 
-    // Auto-scroll for the image slider
     const interval = setInterval(() => {
       const currentIndex = Math.floor(scrollX._value / width);
       const nextIndex = currentIndex === sliderImages.length - 1 ? 0 : currentIndex + 1;
@@ -79,18 +73,15 @@ const ServicesDashboard = () => {
     return () => clearInterval(interval);
   }, [fadeAnim, scrollX]);
 
-  // Function to navigate to specific service screen
   const navigateToServiceScreen = (route) => {
     navigation.navigate(route);
   };
 
-  // Function to handle search query change
   const handleSearchChange = (query) => {
     setSearchQuery(query);
     filterServices(query);
   };
 
-  // Function to filter services based on search query
   const filterServices = (query) => {
     const filtered = servicesData.filter((service) =>
       service.name.toLowerCase().includes(query.toLowerCase())
@@ -98,7 +89,6 @@ const ServicesDashboard = () => {
     setFilteredServices(filtered);
   };
 
-  // Function to toggle the hamburger menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     Animated.timing(menuAnim, {
@@ -108,14 +98,12 @@ const ServicesDashboard = () => {
     }).start();
   };
 
-  // Function to close the menu when clicking outside
   const handleOutsidePress = () => {
     if (isMenuOpen) {
       toggleMenu();
     }
   };
 
-  // Function to navigate to different screens from the menu
   const handleMenuNavigation = (route) => {
     setIsMenuOpen(false);
     navigation.navigate(route);
@@ -126,13 +114,12 @@ const ServicesDashboard = () => {
     }).start();
   };
 
- // Function to handle log-out and navigate to sign-in screen
+  const handleLogoutPress = () => {
+    handleLogout(navigation);
+  };
 
-  
-
-  // Interpolation for rotating the background image
   const rotate = scrollY.interpolate({
-    inputRange: [-900, 900], // You can adjust this range for more or less rotation
+    inputRange: [-900, 900],
     outputRange: ['-360deg', '360deg'],
     extrapolate: 'clamp',
   });
@@ -141,7 +128,7 @@ const ServicesDashboard = () => {
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
       <View style={styles.container}>
         <Animated.Image source={require('../assets/BackGround/Servico_Logo_Bg.jpeg')} style={[styles.mainBackground, { transform: [{ rotate }] }]} />
-        {/* Hamburger Menu */}
+        
         <Animated.View style={[styles.hamburgerMenu, { transform: [{ translateX: menuAnim }] }]}>
           <Image source={require('../assets/BackGround/hamburger_Bg.jpg')} style={styles.menuBackground} />
           <TouchableOpacity onPress={() => toggleMenu()} style={styles.closeMenuButton}>
@@ -157,9 +144,9 @@ const ServicesDashboard = () => {
             <Image source={require('../assets/Icons/terms_and_conditions.png')} style={styles.menuItemIcon} />
             <Text style={styles.menuItemText}>Terms and Conditions</Text>
           </TouchableOpacity>
-          {/* Log-out Option */}
+          
           <View style={styles.menuBottom}>
-            <TouchableOpacity onPress={handleLogout} style={styles.menuItem}>
+            <TouchableOpacity onPress={handleLogoutPress} style={styles.menuItem}>
               <Image source={require('../assets/Icons/logout.png')} style={styles.menuItemIcon} />
               <Text style={styles.menuItemText}>Log Out</Text>
             </TouchableOpacity>
@@ -322,7 +309,9 @@ const styles = StyleSheet.create({
   },
   menuBottom: {
     marginTop: 'auto', // Ensure this sticks to the bottom
-    width: '100%',
+   // width: '100%',
+    marginBottom:30,
+    marginHorizontal:20,
   },
   firstScroll: {
     marginTop: 30,

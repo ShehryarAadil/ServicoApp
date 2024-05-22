@@ -10,14 +10,14 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Start">
-        <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
-        <Stack.Screen name="Choose_Ss_Sp" component={Choose_Ss_Sp} options={{ headerShown: false }} />
-        <Stack.Screen name="Ss_Call" component={Ss_Call} options={{ headerShown: false }} />
-        <Stack.Screen name="Sp_Call" component={Sp_Call} options={{ headerShown: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Start">
+          <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
+          <Stack.Screen name="Choose_Ss_Sp" component={Choose_Ss_Sp} options={{ headerShown: false }} />
+          <Stack.Screen name="Ss_Call" component={Ss_Call} options={{ headerShown: false }} />
+          <Stack.Screen name="Sp_Call" component={Sp_Call} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 };
 

@@ -1,4 +1,3 @@
-//SignInScreen.js
 import React, { useState } from 'react';
 import { View, Image, TextInput, TouchableOpacity, Text, StyleSheet, Alert, Modal, Pressable } from 'react-native';
 import { auth } from '../firebase';
@@ -15,7 +14,7 @@ const SignInScreen = () => {
 
   const handleSignIn = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       // User is logged in, no need to navigate manually
     } catch (error) {
       console.error(error);
@@ -28,6 +27,7 @@ const SignInScreen = () => {
       await sendPasswordResetEmail(auth, resetEmail);
       Alert.alert('Password Reset', 'Password reset link sent to your email.');
       setResetEmail('');
+      setShowResetModal(false);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Failed to send password reset email.');

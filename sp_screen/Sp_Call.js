@@ -3,14 +3,14 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 //import SS_Call
-import Services from '../ss_screens/Services';
+import Registration from './Registraion'
 
 const Stack = createStackNavigator();
 
 const Sp_Call = () => {
     return (
-      <Stack.Navigator initialRouteName="Services" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Services" component={Services} />  
+      <Stack.Navigator initialRouteName="Registraion" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Registration" component={Registration} />  
       </Stack.Navigator>
     );
   };
