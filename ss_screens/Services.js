@@ -144,6 +144,10 @@ const ServicesDashboard = () => {
             <Image source={require('../assets/Icons/terms_and_conditions.png')} style={styles.menuItemIcon} />
             <Text style={styles.menuItemText}>Terms and Conditions</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleMenuNavigation('Start')} style={styles.menuItem}>
+            <Image source={require('../assets/Icons/ServiceProvider.png')} style={styles.menuItemIcon} />
+            <Text style={styles.menuItemText}>Go to Service Provider Menu</Text>
+          </TouchableOpacity>
           
           <View style={styles.menuBottom}>
             <TouchableOpacity onPress={handleLogoutPress} style={styles.menuItem}>

@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator, Animated, Easing, Dimensions, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { db } from '../firebase'; // Ensure your firebase.js exports db
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db, auth } from '../firebase'; // Ensure your firebase.js exports db and auth
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import Toast from 'react-native-toast-message';
 
 const { width } = Dimensions.get('window');
 
@@ -37,7 +38,7 @@ const GardenerScreen = () => {
   useEffect(() => {
     const fetchServices = async () => {
       setLoading(true);
-      const q = query(collection(db, 'Services'), where('S_Category', '==', 'GardenerService'));
+      const q = query(collection(db, 'Services'), where('S_Category', '==', 'Gardener Service'));
       const querySnapshot = await getDocs(q);
       const servicesList = [];
       querySnapshot.forEach((doc) => {
@@ -64,12 +65,43 @@ const GardenerScreen = () => {
     return () => clearInterval(interval);
   }, [scrollX]);
 
-  const handleAddToCart = () => {
-    setShowConfetti(true);
-    setTimeout(() => {
-      setShowConfetti(false);
-      setShowProceedButton(true);
-    }, 3000);
+  const handleAddToCart = async (serviceId, serviceName, servicePrice,) => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const q = query(collection(db, 'Cart'), where('userId', '==', user.uid), where('serviceId', '==', serviceId));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          await addDoc(collection(db, 'Cart'), {
+            userId: user.uid,
+            serviceId,
+            serviceName,
+            servicePrice,
+          });
+          setShowConfetti(true);
+          setTimeout(() => {
+            setShowConfetti(false);
+            setShowProceedButton(true);
+          }, 3000);
+        } else {
+          Toast.show({
+            type: 'info',
+            text1: 'Already added to the Cart',
+            position: 'bottom', // Position: 'top', 'bottom', 'center'
+            visibilityTime: 3000, // Duration in ms
+            autoHide: true,
+            topOffset: 40, // Offset from the top
+            bottomOffset: 40, // Offset from the bottom
+            onPress: () => { /* Optional callback when toast is pressed */ },
+            props: { /* Custom props to pass to the toast */ },
+          });
+        }
+      } else {
+        console.log('User not authenticated');
+      }
+    } catch (error) {
+      console.error('Error adding to cart: ', error);
+    }
   };
 
   const handleProceedToCheckout = () => {
@@ -78,9 +110,9 @@ const GardenerScreen = () => {
 
   const renderServiceButton = ({ item }) => {
     const serviceImage = serviceImages[item.ServiceId] || defaultImage;
-
+    
     return (
-      <TouchableOpacity style={styles.serviceButton} onPress={handleAddToCart}>
+      <TouchableOpacity style={styles.serviceButton} onPress={() => handleAddToCart(item.ServiceId, item.ServiceName, item.ServicePrice)}>
         <Image source={serviceImage} style={styles.serviceButtonImage} />
         <View style={styles.serviceButtonTextContainer}>
           <Text style={styles.serviceButtonText}>{item.ServiceName}</Text>
@@ -98,6 +130,7 @@ const GardenerScreen = () => {
             <Text style={styles.backButtonText}>←</Text>
           </View>
         </TouchableOpacity>
+       
         <ScrollView
           horizontal
           pagingEnabled
@@ -111,38 +144,37 @@ const GardenerScreen = () => {
           ))}
         </ScrollView>
       </View>
+      
+      <View style={styles.headerContainer}>
+        <Text style={styles.heading}>Gardener</Text>
+      </View>
 
-      <ScrollView style={styles.scrollContainer}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.heading}>Gardener</Text>
-        </View>
+      <View style={styles.descriptionContainer}>
+        <Text style={styles.description}>
+          Our professional gardeners provide top-notch services to keep your garden beautiful and healthy.
+          They can handle everything from planting and pruning to lawn care and pest control.
+        </Text>
+      </View>
 
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>
-            Our professional gardeners provide top-notch services to keep your garden beautiful and healthy.
-            They can handle everything from planting and pruning to lawn care and pest control.
-          </Text>
-        </View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={services}
+          renderItem={renderServiceButton}
+          keyExtractor={(item) => item.id}
+          style={styles.serviceButtonContainer}
+        />
+      )}
 
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : (
-          <FlatList
-            data={services}
-            renderItem={renderServiceButton}
-            keyExtractor={(item) => item.id}
-            style={styles.serviceButtonContainer}
-          />
-        )}
+      {showConfetti && <ConfettiCannon count={200} origin={{ x: -10, y: 0 }} fallSpeed={3000} ref={confettiRef} />}
 
-        {showConfetti && <ConfettiCannon count={200} origin={{ x: -10, y: 0 }} fallSpeed={3000} ref={confettiRef} />}
-
-        {showProceedButton && (
-          <TouchableOpacity style={styles.proceedButton} onPress={handleProceedToCheckout}>
-            <Text style={styles.proceedButtonText}>Proceed to Checkout</Text>
-          </TouchableOpacity>
-        )}
-      </ScrollView>
+      {showProceedButton && (
+        <TouchableOpacity style={styles.proceedButton} onPress={handleProceedToCheckout}>
+          <Text style={styles.proceedButtonText}>Proceed to Checkout</Text>
+        </TouchableOpacity>
+      )}
+      <Toast />
     </View>
   );
 };
@@ -187,9 +219,6 @@ const styles = StyleSheet.create({
     width: width,
     height: 200,
     resizeMode: 'cover',
-  },
-  scrollContainer: {
-    flex: 1,
   },
   headerContainer: {
     paddingHorizontal: 20,

@@ -1,9 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { db, auth } from '../firebase'; // Ensure your firebase.js exports db and auth
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const Choose_Ss_Sp = () => {
   const navigation = useNavigation();
+
+  const handleServiceProviderPress = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      Alert.alert('Error', 'User not authenticated');
+      return;
+    }
+
+    const userEmail = user.email;
+    const q = query(collection(db, 'Sp_Data'), where('Email', '==', userEmail));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      navigation.navigate('Sp_Dashboard');
+    } else {
+      navigation.navigate('Sp_Call');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -20,7 +40,7 @@ const Choose_Ss_Sp = () => {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('Sp_Call')}
+          onPress={handleServiceProviderPress}
         >
           <Text style={styles.buttonText}>Service Provider</Text>
         </TouchableOpacity>
@@ -40,14 +60,14 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
-    opacity: 0.3, 
+    opacity: 0.3,
   },
   content: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   logo: {
-    width: 150,  
+    width: 150,
     height: 150,
     marginBottom: 50,
   },

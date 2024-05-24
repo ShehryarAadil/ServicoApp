@@ -4,13 +4,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 //import SS_Call
 import Registration from './Registraion'
-
+import Sp_Dashboard from './Sp_Dashboard';
 const Stack = createStackNavigator();
 
 const Sp_Call = () => {
     return (
       <Stack.Navigator initialRouteName="Registraion" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Registration" component={Registration} />  
+        <Stack.Screen name="Sp_Dashboard" component={Sp_Dashboard} />  
+
       </Stack.Navigator>
     );
   };
